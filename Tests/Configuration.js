@@ -8,6 +8,11 @@ Configuration.name = 'ART SVG Parser';
 // Presets - combine the sets and the source to a preset to easily run a test
 Configuration.presets = {
 
+	'samples': {
+		sets: ['samples'],
+		source: ['core-1.3-base', 'core-1.3-client', 'utils', 'color', 'art-0.9', 'art-svg']
+	},
+
 	'svg-1.1-full': {
 		sets: ['svg-1.1-full', 'svg-1.1-basic', 'svg-1.1-tiny'],
 		source: ['core-1.3-base', 'core-1.3-client', 'utils', 'color', 'art-0.9', 'art-svg']
@@ -37,6 +42,15 @@ Configuration.presets = {
  * relative to the given paths
  */
 Configuration.sets = {
+
+	'samples': {
+		keyPath: 'Samples/',
+		testPath: 'Samples/',
+		files: [
+			'Tiger',
+			'Lion'
+		]
+	},
 
 	'svg-1.1-full': {
 		keyPath: 'SVG1.1/png/full-',
@@ -898,6 +912,7 @@ Configuration.source = {
 	'utils': {
 		path: 'utils/',
 		files: [
+			'URI',
 			'Request.XML'
 		]
 	},

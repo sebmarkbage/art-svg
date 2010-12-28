@@ -6,7 +6,6 @@ if (!ART.SVG) ART.SVG = {};
 
 var matchURL = /^\s*url\(\s*([^\)]*?)\s*\)/,
 	number = '(?:(?:\\s+|\\s*,\\s*)([^\\s,\\)]+))?',
-	matchTransform = new RegExp('[a-z]+\\s*\(\\s*([^\\s,\\)]+)' + number + number + number + number + number + '\s*\)', 'gi'),
 	matchViewBox = new RegExp('^\\s*([^\\s,]+)' + number + number + number),
 	matchUnit = /^\s*([\+\-\d\.]+(?:e\d+)?)(|px|em|ex|in|pt|pc|mm|cm|%)\s*$/i;
 
@@ -23,12 +22,16 @@ ART.SVG.Parser = new Class({
 		currentFontSize: 12
 	},
 	
+	resolveURL: function(url){
+		return url;
+	},
+	
 	parse: function(element){
 		if (element.documentElement){
 			element = element.documentElement;
 			var canvas = new ART(
-				this.parseUnit(element.getAttribute('width'), 'x'),
-				this.parseUnit(element.getAttribute('height'), 'y')
+				this.parseUnit(element.getAttribute('width') || '100%', 'x'),
+				this.parseUnit(element.getAttribute('height') || '100%', 'y')
 			);
 			if (element.getAttribute('viewBox'))
 				canvas.grab(this.parse(element));
@@ -167,7 +170,8 @@ ART.SVG.Parser = new Class({
 
 	transform: function(element, target){
 		var transform = element.getAttribute('transform'), match;
-		while(match = matchTransform.exec(transform)){
+		var matchTransform = new RegExp('([a-z]+)\\s*\\(\\s*([^\\s,\\)]+)' + number + number + number + number + number + '\\s*\\)', 'gi');
+		while(match = transform && matchTransform.exec(transform)){
 			switch(match[1]){
 				case 'matrix':
 					target.transform(match[2], match[3], match[4], match[5], match[6], match[7]);
@@ -185,10 +189,10 @@ ART.SVG.Parser = new Class({
 						.transform(1, 0, 0, 1, -match[3], -match[4]);
 					break;
 				case 'skewX':
-					target.transform(1, Math.tan(match[2] * Math.PI / 180), 0, 1);
+					target.transform(1, 0, Math.tan(match[2] * Math.PI / 180), 1);
 					break;
 				case 'skewY':
-					target.transform(1, 0, Math.tan(match[2] * Math.PI / 180), 1);
+					target.transform(1, Math.tan(match[2] * Math.PI / 180), 0, 1);
 					break;
 			}
 		}
@@ -212,7 +216,7 @@ ART.SVG.Parser = new Class({
 	},
 	
 	useElement: function(element){
-		var href = element.getAttribute('href');
+		var href = element.getAttribute('xlink:href');
 		if (href[0] != '#') return null;
 		var target = this.findById(element.ownerDocument, href.substr(1));
 		if (!target) return null;
@@ -239,8 +243,16 @@ ART.SVG.Parser = new Class({
 	},
 	
 	imageElement: function(element){
-		var image = new ART.Image(element.getAttribute('href'), element.getAttribute('width'), element.getAttribute('height'));
-		return this.transform(element, symbol);
+		var image = new ART.SVG.Image(
+			this.resolveURL(element.getAttribute('xlink:href')),
+			this.parseUnit(element.getAttribute('width'), 'x'),
+			this.parseUnit(element.getAttribute('height'), 'y')
+		);
+		var styles = this.getElementStyles(element);
+		if (styles.hasOwnProperty('opacity') && +styles.opacity != 1) target.blend(+styles.opacity);
+		this.transform(element, image);
+		image.transform(1, 0, 0, 1, this.parseUnit(element.getAttribute('x'), 'x'), this.parseUnit(element.getAttribute('y'), 'y'));
+		return image;
 	}
 
 });

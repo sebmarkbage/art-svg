@@ -32,6 +32,9 @@ var testRunner = function(svgPath, pngPath){
 		var img = new Image();
 		img.onload = function(){
 			var parser = new ART.SVG.Parser();
+			parser.resolveURL = function(url){
+				return new URI(url, { base: svgPath}).toString();
+			};
 			parser.inheritedStyles.viewportWidth = img.width;
 			parser.inheritedStyles.viewportHeight = img.height;
 			new Request.XML({
