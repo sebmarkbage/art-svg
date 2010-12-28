@@ -11,13 +11,13 @@ ART.Script.
 Load the SVG content as a XML document. Pass the whole document or an element to ART.SVG.parse and you
 get an ART object tree in return.
 
-var canvas = ART.SVG.parse(document);
-canvas.inject(document.body);
+	var canvas = ART.SVG.parse(document);
+	canvas.inject(document.body);
 
 OR
 
-var graphics = ART.SVG.parse(element);
-graphics.inject(canvas);
+	var graphics = ART.SVG.parse(element);
+	graphics.inject(canvas);
 
 If you pass an entire document, you get an ART canvas in return that you could inject into a HTML DOM.
 
