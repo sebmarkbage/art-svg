@@ -16,7 +16,7 @@ get an ART object tree in return.
 
 OR
 
-	var graphics = ART.SVG.parse(element);
+	var graphics = ART.SVG.parse(xmlNode);
 	graphics.inject(canvas);
 
 If you pass an entire document, you get an ART canvas in return that you could inject into a HTML DOM.
