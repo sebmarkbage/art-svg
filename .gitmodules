@@ -1,0 +1,6 @@
+[submodule "Tests/mootools-core"]
+	path = Tests/mootools-core
+	url = http://github.com/mootools/mootools-core.git
+[submodule "Tests/art"]
+	path = Tests/art
+	url = http://github.com/calyptus/art.git
