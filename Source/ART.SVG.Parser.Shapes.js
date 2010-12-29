@@ -26,7 +26,7 @@ ART.SVG.Parser.implement({
 		    y = this.getLengthAttribute(element, styles, 'cy', 'y'),
 		    rx = this.getLengthAttribute(element, styles, 'rx', 'x'),
 		    ry = this.getLengthAttribute(element, styles, 'ry', 'y'),
-		    shape = new ART.Ellipse(rx * 2, ry * 2);
+		    shape = ry != 0 ? new ART.Ellipse(rx * 2, ry * 2) : new ART.Shape();
 		this.shape(element, styles, shape);
 		return shape.transform(1, 0, 0, 1, x - rx, y - ry);
 	},
