@@ -82,7 +82,7 @@ ART.SVG.Parser = new Class({
 		treewalker: while (node){
 			if (node.nodeType == 1){
 				var newID = node.getAttribute('id');
-				if (newID && ids[newID] != null) ids[newID] = node;
+				if (newID && ids[newID] == null) ids[newID] = node;
 				if (newID == id){
 					this.lastSweep = node;
 					return node;
