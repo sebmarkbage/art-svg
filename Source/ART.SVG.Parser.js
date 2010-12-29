@@ -133,6 +133,10 @@ ART.SVG.Parser = new Class({
 		return color;
 	},
 	
+	getLengthAttribute: function(element, styles, attr, dimension){
+		return this.parseLength(element.getAttribute(attr) || 0, styles, dimension);
+	},
+	
 	container: function(element, styles, container){
 		if (container.width != null) styles.viewportWidth = container.width;
 		if (container.height != null) styles.viewportHeight = container.height;
@@ -213,8 +217,8 @@ ART.SVG.Parser = new Class({
 		var viewbox = element.getAttribute('viewBox'),
 		    match = matchViewBox.exec(viewbox),
 		    group = match ? new ART.Group(+match[3], +match[4]).move(-match[1], -match[2]) : new ART.Group(),
-		    width = this.parseLength(element.getAttribute('width'), styles, 'x'),
-		    height = this.parseLength(element.getAttribute('height'), styles, 'y');
+		    width = this.getLengthAttribute(element, styles, 'width', 'x'),
+		    height = this.getLengthAttribute(element, styles, 'height', 'y');
 		if (width && height) group.resizeTo(width, height); // TODO: Aspect ratio
 		this.container(element, styles, group);
 		return group;
@@ -263,13 +267,13 @@ ART.SVG.Parser = new Class({
 	imageElement: function(element, styles){
 		var image = new ART.SVG.Image(
 			this.resolveURL(element.getAttribute('xlink:href')),
-			this.parseLength(element.getAttribute('width'), styles, 'x'),
-			this.parseLength(element.getAttribute('height'), styles, 'y')
+			this.getLengthAttribute(element, styles, 'width', 'x'),
+			this.getLengthAttribute(element, styles, 'height', 'y')
 		);
 		this.filter(element, styles, image);
 		this.transform(element, image);
-		var x = this.parseLength(element.getAttribute('x'), styles, 'x'),
-		    y = this.parseLength(element.getAttribute('y'), styles, 'y');
+		var x = this.getLengthAttribute(element, styles, 'x', 'x'),
+		    y = this.getLengthAttribute(element, styles, 'y', 'y');
 		image.transform(1, 0, 0, 1, x, y);
 		return image;
 	}
