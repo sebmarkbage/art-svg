@@ -12,37 +12,63 @@ var matchURL = /^\s*url\(\s*([^\)]*?)\s*\)/,
 // Environment Settings
 var dpi = 72, emToEx = 0.5;
 
+var styleSheet = function(){},
+	defaultStyles = {
+		viewportWidth: 500,
+		viewportHeight: 500,
+		'font-size': 12,
+		color: 'black'
+	};
+
 // Visitor
 
 ART.SVG.Parser = new Class({
 
-	inheritedStyles: {
-		viewportWidth: 500,
-		viewportHeight: 500,
-		currentFontSize: 12
-	},
-	
-	resolveURL: function(url){
-		return url;
-	},
-	
-	parse: function(element){
+	parse: function(element, styles){
+		if (!styles) styles = defaultStyles;
+		else
+			for (var style in defaultStyles)
+				if (!(styles in styles)) styles[styles] = defaultStyles[styles];
+		
 		if (element.documentElement){
 			element = element.documentElement;
 			var canvas = new ART(
-				this.parseUnit(element.getAttribute('width') || '100%', 'x'),
-				this.parseUnit(element.getAttribute('height') || '100%', 'y')
+				this.parseLength(element.getAttribute('width') || '100%', styles, 'x'),
+				this.parseLength(element.getAttribute('height') || '100%', styles, 'y')
 			);
 			if (element.getAttribute('viewBox'))
-				canvas.grab(this.parse(element));
+				canvas.grab(this.parse(element, styles));
 			else
-				this.container(element, canvas);
+				this.container(element, this.parseStyles(element, styles), canvas);
 			return canvas;
 		}
+		if (element.nodeType != 1) return null;
+		styles = this.parseStyles(element, styles);
 		var parseFunction = this[element.nodeName + 'Element'];
-		return parseFunction ? parseFunction.call(this, element) : null;
+		return parseFunction ? parseFunction.call(this, element, styles) : null;
 	},
 	
+	parseStyles: function(element, styles){
+		styleSheet.prototype = styles;
+		var newSheet = new styleSheet();
+		this.fillElementStyles(element, newSheet);
+		if (newSheet.hasOwnProperty('font-size')){
+			var newFontSize = this.parseLength(newSheet['font-size'], styles, 'font');
+			if (newFontSize != null) newSheet['font-size'] = newFontSize;
+		}
+		return newSheet;
+	},
+	
+	fillElementStyles: function(element, target){
+		var attributes = element.attributes;
+		for (var i = 0, l = attributes.length; i < l; i++){
+			var attribute = attributes[i];
+			if (attribute.nodeValue != 'inherit')
+				target[attribute.nodeName] = attribute.nodeValue;
+		}
+		return target;
+	},
+
 	findById: function(document, id){
 		if (document.getElementById) return document.getElementById(id);
 		var ids = this.ids || (this.ids = {});
@@ -69,37 +95,24 @@ ART.SVG.Parser = new Class({
 		}
 		return null;
 	},
-		
-	fillElementStyles: function(element, target){
-		var attributes = element.attributes;
-		for (var i = 0, l = attributes.length; i < l; i++){
-			var attribute = attributes[i];
-			target[attribute.nodeName] = attribute.nodeValue;
-		}
-		return target;
+	
+	findByURL: function(document, url){
+		if (url != '#') return null; // External document references are not supported
+		return this.findById(document, url.substr(1));
 	},
 
-	getElementStyles: function(element){
-		var styleSheet = function(){};
-		styleSheet.prototype = this.inheritedStyles;
-		var newSheet = new styleSheet();
-		this.fillElementStyles(element, newSheet);
-		if (newSheet.hasOwnProperty('font-size')){
-			var newFontSize = this.parseUnit(newSheet['font-size'], 'font');
-			if (newFontSize != null) newSheet.currentFontSize = newFontSize;
-		}
-		return newSheet;
+	resolveURL: function(url){
+		return url;
 	},
 	
-	parseUnit: function(value, dimension){
+	parseLength: function(value, styles, dimension){
 		var match = matchUnit.exec(value);
 		if (!match) return null;
-		var result = parseFloat(match[1]),
-		    styles = this.inheritedStyles;
+		var result = parseFloat(match[1]);
 		switch(match[2]){
 			case '': case 'px': return result;
-			case 'em': return result * styles.currentFontSize;
-			case 'ex': return result * styles.currentFontSize * emToEx;
+			case 'em': return result * styles['font-size'];
+			case 'ex': return result * styles['font-size'] * emToEx;
 			case 'in': return result * dpi;
 			case 'pt': return result * dpi / 72;
 			case 'pc': return result * dpi / 6;
@@ -107,65 +120,59 @@ ART.SVG.Parser = new Class({
 			case 'cm': return result * dpi / 2.54;
 			case '%':
 				var w = styles.viewportWidth, h = styles.viewportHeight;
-				if (dimension == 'font') return result * styles.currentFontSize / 100;
+				if (dimension == 'font') return result * styles['font-size'] / 100;
 				if (dimension == 'x') return result * w / 100;
 				if (dimension == 'y') return result * h / 100;
 				return result * Math.sqrt(w * w + h * h) / Math.sqrt(2) / 100;
 		}
 	},
 	
-	container: function(element, container){
-		var parentStyles = this.inheritedStyles;
-		var styles = this.inheritedStyles = this.getElementStyles(element);
+	parseColor: function(value, opacity, styles){
+		var color = new Color(value == 'currentColor' ? styles.color : value);
+		color.alpha = opacity == null ? 1 : +opacity;
+		return color;
+	},
+	
+	container: function(element, styles, container){
 		if (container.width != null) styles.viewportWidth = container.width;
 		if (container.height != null) styles.viewportHeight = container.height;
-		if (styles.hasOwnProperty('opacity') && +styles.opacity != 1) target.blend(+styles.opacity);
+		this.filter(element, styles, container);
 		var node = element.firstChild;
 		while (node){
-			var art = this.parse(node);
+			var art = this.parse(node, styles);
 			if (art) container.grab(art);
 			node = node.nextSibling;
 		}
-		this.inheritedStyles = parentStyles;
 		return container;
 	},
 
-	shape: function(element, target){
+	shape: function(element, styles, target){
 		this.transform(element, target);
-		var styles = this.getElementStyles(element);
-		if (styles.fill) this.fillShape(styles, target);
-		if (styles.stroke) this.strokeShape(styles, target);
-		if (styles.hasOwnProperty('opacity') && +styles.opacity != 1) target.blend(+styles.opacity);
+		this.fill(element, styles, target);
+		this.stroke(element, styles, target);
+		this.filter(element, styles, target);
 		return target;
 	},
 	
-	fillShape: function(styles, target){
+	fill: function(element, styles, target){
+		if (!styles.fill || styles.fill == 'none') return;
 		var match;
 		if (match = matchURL.exec(styles.fill)){
-			if (match[1][0] == '#'){
-				var fill = this.findById(match[1].substr(1)),
-					fillFunction = fill && this[fill.nodeName + 'Fill'];
-				if (fillFunction) fillFunction.call(this, fill, target);
-			}
-		} else if (styles.fill != 'none') {
-			var color = new Color(styles.fill);
-			color.alpha = styles['fill-opacity'] == null ? 1 : +styles['fill-opacity'];
-			target.fill(color);
+			var fill = this.findByURL(element.ownerDocument, match[1]),
+			    fillFunction = fill && this[fill.nodeName + 'Fill'];
+			if (fillFunction) fillFunction.call(this, fill, target);
+		} else {
+			target.fill(this.parseColor(styles.fill, styles['fill-opacity'], styles));
 		}
 	},
 	
-	strokeShape: function(styles, target){
-		var match;
-		if (matchURL.test(styles.stroke)){
-			// Advanced stroke colors are not supported, TODO: log
-		} else if (styles.stroke != 'none'){
-			var color = new Color(styles.stroke),
-				width = styles['stroke-width'],
-				cap = styles['stroke-linecap'] || 'butt',
-				join = styles['stroke-linejoin'] || 'miter';
-			color.alpha = styles['stroke-opacity'] == null ? 1 : +styles['stroke-opacity'];
-			target.stroke(color, width == null ? 1 : width, cap, join);
-		}
+	stroke: function(element, styles, target){
+		if (!styles.stroke || styles.stroke == 'none' || matchURL.test(styles.stroke)) return; // Advanced stroke colors are not supported, TODO: log
+		var color = this.parseColor(styles.stroke, styles['stroke-opacity'], styles),
+			width = this.parseLength(styles['stroke-width'], styles),
+			cap = styles['stroke-linecap'] || 'butt',
+			join = styles['stroke-linejoin'] || 'miter';
+		target.stroke(color, width == null ? 1 : width, cap, join);
 	},
 
 	transform: function(element, target){
@@ -196,62 +203,74 @@ ART.SVG.Parser = new Class({
 					break;
 			}
 		}
-		return target;
 	},
 	
-	svgElement: function(element){
+	filter: function(element, styles, target){
+		if (styles.hasOwnProperty('opacity') && styles.opacity != 1) target.blend(styles.opacity);
+	},
+	
+	svgElement: function(element, styles){
 		var viewbox = element.getAttribute('viewBox'),
 		    match = matchViewBox.exec(viewbox),
 		    group = match ? new ART.Group(+match[3], +match[4]).move(-match[1], -match[2]) : new ART.Group(),
-		    width = this.parseUnit(element.getAttribute('width'), 'x'),
-		    height = this.parseUnit(element.getAttribute('height'), 'y');
+		    width = this.parseLength(element.getAttribute('width'), styles, 'x'),
+		    height = this.parseLength(element.getAttribute('height'), styles, 'y');
 		if (width && height) group.resizeTo(width, height); // TODO: Aspect ratio
-		return this.container(element, group);
+		this.container(element, styles, group);
+		return group;
 	},
 	
-	gElement: function(element){
+	gElement: function(element, styles){
 		var group = new ART.Group();
 		this.transform(element, group);
-		return this.container(element, group);
+		this.container(element, styles, group);
+		return group;
 	},
 	
-	useElement: function(element){
-		var href = element.getAttribute('xlink:href');
-		if (href[0] != '#') return null;
-		var target = this.findById(element.ownerDocument, href.substr(1));
+	useElement: function(element, styles){
+		var target = this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'));
 		if (!target) return null;
 
-		var parentStyles = this.inheritedStyles;
-		this.inheritedStyles = this.getElementStyles(element);
-		var symbol = (target.nodeName == 'symbol') ? this.svgElement(target) : this.parse(target);
-		this.inheritedStyles = parentStyles;
+		var symbol = (target.nodeName == 'symbol') ? this.svgElement(target, this.parseStyles(target, styles)) : this.parse(target, styles);
 
 		var width = element.getAttribute('width'), height = element.getAttribute('height');
 		if (width && height) symbol.resizeTo(width, height); // TODO: Aspect ratio
 
+		// Inject move before other transform to avoid nested groups
 		var targetTransform = new ART.Transform(symbol);
-
-		// Reapply transform to avoid nested groups
-		return this.transform(element, symbol.transformTo(1, 0, 0, 1))
+		this.transform(element, symbol.transformTo(1, 0, 0, 1));
+		return symbol
 			.move(element.getAttribute('x') || 0, element.getAttribute('y') || 0)
 			.transform(targetTransform);
 	},
 	
-	pathElement: function(element){
-		var shape = new ART.Shape(element.getAttribute('d'));
-		return this.shape(element, shape);
+	switchElement: function(element, styles){
+		var node = element.firstChild;
+		while (node){
+			var art = this.parse(node, styles);
+			if (art) return art;
+			node = node.nextSibling;
+		}
+		return null;
 	},
 	
-	imageElement: function(element){
+	pathElement: function(element, styles){
+		var shape = new ART.Shape(element.getAttribute('d'));
+		this.shape(element, styles, shape);
+		return shape;
+	},
+	
+	imageElement: function(element, styles){
 		var image = new ART.SVG.Image(
 			this.resolveURL(element.getAttribute('xlink:href')),
-			this.parseUnit(element.getAttribute('width'), 'x'),
-			this.parseUnit(element.getAttribute('height'), 'y')
+			this.parseLength(element.getAttribute('width'), styles, 'x'),
+			this.parseLength(element.getAttribute('height'), styles, 'y')
 		);
-		var styles = this.getElementStyles(element);
-		if (styles.hasOwnProperty('opacity') && +styles.opacity != 1) target.blend(+styles.opacity);
+		this.filter(element, styles, image);
 		this.transform(element, image);
-		image.transform(1, 0, 0, 1, this.parseUnit(element.getAttribute('x'), 'x'), this.parseUnit(element.getAttribute('y'), 'y'));
+		var x = this.parseLength(element.getAttribute('x'), styles, 'x'),
+		    y = this.parseLength(element.getAttribute('y'), styles, 'y');
+		image.transform(1, 0, 0, 1, x, y);
 		return image;
 	}
 

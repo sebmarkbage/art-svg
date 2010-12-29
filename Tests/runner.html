@@ -35,13 +35,11 @@ var testRunner = function(svgPath, pngPath){
 			parser.resolveURL = function(url){
 				return new URI(url, { base: svgPath}).toString();
 			};
-			parser.inheritedStyles.viewportWidth = img.width;
-			parser.inheritedStyles.viewportHeight = img.height;
 			new Request.XML({
 				url: svgPath,
 				onSuccess: function(txt, doc){
 					try {
-					var result = parser.parse(doc);
+						var result = parser.parse(doc, { viewportWidth: img.width, viewportHeight: img.height });
 					} catch (x){
 						failed(x);
 						throw x;
