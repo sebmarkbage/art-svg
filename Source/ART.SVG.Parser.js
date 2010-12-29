@@ -70,8 +70,13 @@ ART.SVG.Parser = new Class({
 	},
 
 	findById: function(document, id){
-		if (document.getElementById) return document.getElementById(id);
-		var ids = this.ids || (this.ids = {});
+		// if (document.getElementById) return document.getElementById(id); Not reliable
+		if (this.cacheDocument != document){
+			this.ids = {};
+			this.lastSweep = null;
+			this.cacheDocument = document;
+		}
+		var ids = this.ids;
 		if (ids[id] != null) return ids[id];
 		var root = document.documentElement, node = this.lastSweep || root;
 		treewalker: while (node){
@@ -96,9 +101,8 @@ ART.SVG.Parser = new Class({
 		return null;
 	},
 	
-	findByURL: function(document, url){
-		if (url != '#') return null; // External document references are not supported
-		return this.findById(document, url.substr(1));
+	findByURL: function(document, url, callback){
+		callback(url && url[0] == '#' ? this.findById(document, url.substr(1)) : null);
 	},
 
 	resolveURL: function(url){
@@ -128,8 +132,12 @@ ART.SVG.Parser = new Class({
 	},
 	
 	parseColor: function(value, opacity, styles){
-		var color = new Color(value == 'currentColor' ? styles.color : value);
-		color.alpha = opacity == null ? 1 : +opacity;
+		try {
+			var color = new Color(value == 'currentColor' ? styles.color : value);
+			color.alpha = opacity == null ? 1 : +opacity;
+		} catch (x){
+			return null; // Ignore unparsable colors, TODO: log
+		}
 		return color;
 	},
 	
@@ -162,9 +170,11 @@ ART.SVG.Parser = new Class({
 		if (!styles.fill || styles.fill == 'none') return;
 		var match;
 		if (match = matchURL.exec(styles.fill)){
-			var fill = this.findByURL(element.ownerDocument, match[1]),
-			    fillFunction = fill && this[fill.nodeName + 'Fill'];
-			if (fillFunction) fillFunction.call(this, fill, target);
+			var self = this;
+			this.findByURL(element.ownerDocument, match[1], function(fill){
+				var fillFunction = fill && self[fill.nodeName + 'Fill'];
+				if (fillFunction) fillFunction.call(self, fill, target);
+			});
 		} else {
 			target.fill(this.parseColor(styles.fill, styles['fill-opacity'], styles));
 		}
@@ -216,11 +226,15 @@ ART.SVG.Parser = new Class({
 	svgElement: function(element, styles){
 		var viewbox = element.getAttribute('viewBox'),
 		    match = matchViewBox.exec(viewbox),
-		    group = match ? new ART.Group(+match[3], +match[4]).move(-match[1], -match[2]) : new ART.Group(),
+		    group = match ? new ART.Group(+match[3], +match[4]) : new ART.Group(),
+		    x = this.getLengthAttribute(element, styles, 'x', 'x'),
+		    y = this.getLengthAttribute(element, styles, 'y', 'y'),
 		    width = this.getLengthAttribute(element, styles, 'width', 'x'),
 		    height = this.getLengthAttribute(element, styles, 'height', 'y');
 		if (width && height) group.resizeTo(width, height); // TODO: Aspect ratio
+		if (match) group.transform(1, 0, 0, 1, -match[1], -match[2]);
 		this.container(element, styles, group);
+		group.move(x, y);
 		return group;
 	},
 	
@@ -232,20 +246,25 @@ ART.SVG.Parser = new Class({
 	},
 	
 	useElement: function(element, styles){
-		var target = this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'));
-		if (!target) return null;
+		var self = this,
+		    placeholder = new ART.Group(),
+		    x = this.getLengthAttribute(element, styles, 'x', 'x'),
+		    y = this.getLengthAttribute(element, styles, 'y', 'y'),
+		    width = this.getLengthAttribute(element, styles, 'width', 'x'),
+		    height = this.getLengthAttribute(element, styles, 'height', 'y');
+		
+		this.transform(element, placeholder);
+		placeholder.transform(1, 0, 0, 1, x, y);
 
-		var symbol = (target.nodeName == 'symbol') ? this.svgElement(target, this.parseStyles(target, styles)) : this.parse(target, styles);
-
-		var width = element.getAttribute('width'), height = element.getAttribute('height');
-		if (width && height) symbol.resizeTo(width, height); // TODO: Aspect ratio
-
-		// Inject move before other transform to avoid nested groups
-		var targetTransform = new ART.Transform(symbol);
-		this.transform(element, symbol.transformTo(1, 0, 0, 1));
-		return symbol
-			.move(element.getAttribute('x') || 0, element.getAttribute('y') || 0)
-			.transform(targetTransform);
+		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'), function(target){
+			if (!target) return;
+			var symbol = (target.nodeName == 'symbol') ? self.svgElement(target, self.parseStyles(target, styles)) : self.parse(target, styles);
+			if (!symbol) return;
+			if (width && height) symbol.resizeTo(width, height); // TODO: Aspect ratio, maybe resize the placeholder instead
+			placeholder.grab(symbol);
+		});
+		
+		return placeholder;
 	},
 	
 	switchElement: function(element, styles){
@@ -256,6 +275,11 @@ ART.SVG.Parser = new Class({
 			node = node.nextSibling;
 		}
 		return null;
+	},
+	
+	aElement: function(element, styles){
+		// For now treat it like a group
+		return this.gElement(element, styles);
 	},
 	
 	pathElement: function(element, styles){
