@@ -134,10 +134,11 @@ ART.SVG.Parser = new Class({
 	parseColor: function(value, opacity, styles){
 		try {
 			var color = new Color(value == 'currentColor' ? styles.color : value);
-			color.alpha = opacity == null ? 1 : +opacity;
 		} catch (x){
+			return new Color('black'); // TEMP: Color unknown colors black for debugging
 			return null; // Ignore unparsable colors, TODO: log
 		}
+		color.alpha = opacity == null ? 1 : +opacity;
 		return color;
 	},
 	
@@ -158,22 +159,23 @@ ART.SVG.Parser = new Class({
 		return container;
 	},
 
-	shape: function(element, styles, target){
+	shape: function(element, styles, target, x, y){
 		this.transform(element, target);
-		this.fill(element, styles, target);
+		target.transform(1, 0, 0, 1, x, y);
+		this.fill(element, styles, target, x, y);
 		this.stroke(element, styles, target);
 		this.filter(element, styles, target);
 		return target;
 	},
 	
-	fill: function(element, styles, target){
+	fill: function(element, styles, target, x, y){
 		if (!styles.fill || styles.fill == 'none') return;
 		var match;
 		if (match = matchURL.exec(styles.fill)){
 			var self = this;
 			this.findByURL(element.ownerDocument, match[1], function(fill){
 				var fillFunction = fill && self[fill.nodeName + 'Fill'];
-				if (fillFunction) fillFunction.call(self, fill, target);
+				if (fillFunction) fillFunction.call(self, fill, self.parseStyles(fill, styles), target, x, y);
 			});
 		} else {
 			target.fill(this.parseColor(styles.fill, styles['fill-opacity'], styles));
@@ -201,7 +203,7 @@ ART.SVG.Parser = new Class({
 					target.transform(1, 0, 0, 1, match[2], match[3]);
 					break;
 				case 'scale':
-					target.transform(match[2], 0, 0, match[3] == null ? match[2] : match[3]);
+					target.transform(match[2], 0, 0, match[3] || match[2]);
 					break;
 				case 'rotate':
 					var rad = match[2] * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad);
@@ -220,7 +222,7 @@ ART.SVG.Parser = new Class({
 	},
 	
 	filter: function(element, styles, target){
-		if (styles.hasOwnProperty('opacity') && styles.opacity != 1) target.blend(styles.opacity);
+		if (styles.hasOwnProperty('opacity') && styles.opacity != 1 && target.blend) target.blend(styles.opacity);
 	},
 	
 	svgElement: function(element, styles){
@@ -255,7 +257,7 @@ ART.SVG.Parser = new Class({
 		
 		this.transform(element, placeholder);
 		placeholder.transform(1, 0, 0, 1, x, y);
-
+		
 		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'), function(target){
 			if (!target) return;
 			var symbol = (target.nodeName == 'symbol') ? self.svgElement(target, self.parseStyles(target, styles)) : self.parse(target, styles);
@@ -289,15 +291,28 @@ ART.SVG.Parser = new Class({
 	},
 	
 	imageElement: function(element, styles){
-		var image = new ART.SVG.Image(
-			this.resolveURL(element.getAttribute('xlink:href')),
-			this.getLengthAttribute(element, styles, 'width', 'x'),
-			this.getLengthAttribute(element, styles, 'height', 'y')
-		);
+		var href = this.resolveURL(element.getAttribute('xlink:href')),
+		    width = this.getLengthAttribute(element, styles, 'width', 'x'),
+		    height = this.getLengthAttribute(element, styles, 'height', 'y'),
+		    x = this.getLengthAttribute(element, styles, 'x', 'x'),
+		    y = this.getLengthAttribute(element, styles, 'y', 'y'),
+		    clipPath = element.getAttribute('clip-path'),
+		    image,
+		    match;
+		
+		if (clipPath && (match = matchURL.exec(clipPath)) && match[1][0] == '#'){
+			var clip = this.findById(element.ownerDocument, match[1].substr(1));
+			if (clip && (clip = this.switchElement(clip, styles)) && typeof clip.fillImage == 'function'){
+				clip.fillImage(href, width, height);
+				image = clip;
+			}
+		}
+		if (!image){
+			//image = new ART.Image(href, width, height); TODO
+			image = new ART.Rectangle(width, height).fillImage(href, width, height);
+		}
 		this.filter(element, styles, image);
 		this.transform(element, image);
-		var x = this.getLengthAttribute(element, styles, 'x', 'x'),
-		    y = this.getLengthAttribute(element, styles, 'y', 'y');
 		image.transform(1, 0, 0, 1, x, y);
 		return image;
 	}

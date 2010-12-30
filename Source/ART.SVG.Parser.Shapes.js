@@ -8,8 +8,8 @@ ART.SVG.Parser.implement({
 		    r = (this.getLengthAttribute(element, styles, 'rx', 'x') +
 		    	this.getLengthAttribute(element, styles, 'ry', 'y')) / 2,
 		    shape = new ART.Rectangle(w, h, r);
-		this.shape(element, styles, shape);
-		return shape.transform(1, 0, 0, 1, x, y);
+		this.shape(element, styles, shape, x, y);
+		return shape;
 	},
 
 	circleElement: function(element, styles){
@@ -17,8 +17,8 @@ ART.SVG.Parser.implement({
 		    y = this.getLengthAttribute(element, styles, 'cy', 'y'),
 		    r = this.getLengthAttribute(element, styles, 'r'),
 		    shape = new ART.Ellipse(r * 2, r * 2);
-		this.shape(element, styles, shape);
-		return shape.transform(1, 0, 0, 1, x - r, y - r);
+		this.shape(element, styles, shape, x - r, y - r);
+		return shape;
 	},
 	
 	ellipseElement: function(element, styles){
@@ -27,8 +27,8 @@ ART.SVG.Parser.implement({
 		    rx = this.getLengthAttribute(element, styles, 'rx', 'x'),
 		    ry = this.getLengthAttribute(element, styles, 'ry', 'y'),
 		    shape = ry != 0 ? new ART.Ellipse(rx * 2, ry * 2) : new ART.Shape();
-		this.shape(element, styles, shape);
-		return shape.transform(1, 0, 0, 1, x - rx, y - ry);
+		this.shape(element, styles, shape, x - rx, y - ry);
+		return shape;
 	},
 	
 	lineElement: function(element, styles){

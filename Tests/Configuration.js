@@ -48,7 +48,8 @@ Configuration.sets = {
 		testPath: 'Samples/',
 		files: [
 			'Tiger',
-			'Lion'
+			'Lion',
+			'Clipping'
 		]
 	},
 
