@@ -5,8 +5,9 @@ if (!ART.SVG) ART.SVG = {};
 // Regular Expressions
 
 var matchURL = /^\s*url\(\s*([^\)]*?)\s*\)/,
-	number = '(?:(?:\\s+|\\s*,\\s*)([^\\s,\\)]+))?',
-	matchViewBox = new RegExp('^\\s*([^\\s,]+)' + number + number + number),
+	requiredNumber = '(?:\\s+|\\s*,\\s*)([^\\s,\\)]+)';
+	number = '(?:' + requiredNumber + ')?',
+	matchViewBox = new RegExp('^\\s*([^\\s,]+)' + requiredNumber + requiredNumber + requiredNumber),
 	matchUnit = /^\s*([\+\-\d\.]+(?:e\d+)?)(|px|em|ex|in|pt|pc|mm|cm|%)\s*$/i;
 
 // Environment Settings
@@ -18,6 +19,31 @@ var styleSheet = function(){},
 		viewportHeight: 500,
 		'font-size': 12,
 		color: 'black'
+	},
+	nonInheritedStyles = {
+		'stop-color': 'black',
+		'stop-opacity': 1,
+		'clip-path': null,
+		'filter': null,
+		'mask': null,
+		'opacity': 1
+	},
+	// Some additional colors not included in Color class
+	namedColors = {
+		crimson: '#dc143c',
+		palegreen: '#98fb98',
+		forestgreen: '#228b22',
+		royalblue: '#4169e1',
+		firebrick: '#b22222',
+		seagreen: '#2e8b57',
+		mediumblue: '#0000cd',
+		indianred: '#cd5c5c',
+		lawngreen: '#7cfc00',
+		mediumturquoise: '#48d1cc',
+		darkblue: '#00008b',
+		gold: '#ffd700',
+		lightblue: '#add8e6',
+		grey: '#808080'
 	};
 
 // Visitor
@@ -25,7 +51,7 @@ var styleSheet = function(){},
 ART.SVG.Parser = new Class({
 
 	parse: function(element, styles){
-		if (!styles) styles = defaultStyles;
+		if (!styles) styles = this.findStyles(element);
 		else
 			for (var style in defaultStyles)
 				if (!(styles in styles)) styles[styles] = defaultStyles[styles];
@@ -51,20 +77,34 @@ ART.SVG.Parser = new Class({
 	parseStyles: function(element, styles){
 		styleSheet.prototype = styles;
 		var newSheet = new styleSheet();
+		for (var key in nonInheritedStyles) newSheet[key] = nonInheritedStyles[key];
 		this.fillElementStyles(element, newSheet);
 		if (newSheet.hasOwnProperty('font-size')){
 			var newFontSize = this.parseLength(newSheet['font-size'], styles, 'font');
 			if (newFontSize != null) newSheet['font-size'] = newFontSize;
 		}
+		if (newSheet.hasOwnProperty('text-decoration')){
+			newSheet['text-decoration-color'] = newSheet.color;
+		}
 		return newSheet;
+	},
+	
+	findStyles: function(element){
+		if (!element || element.nodeType != 1) return defaultStyles;
+		var styles = this.findStyles(element.parentNode);
+		return this.parseStyles(element, styles);
 	},
 	
 	fillElementStyles: function(element, target){
 		var attributes = element.attributes;
 		for (var i = 0, l = attributes.length; i < l; i++){
-			var attribute = attributes[i];
-			if (attribute.nodeValue != 'inherit')
-				target[attribute.nodeName] = attribute.nodeValue;
+			var attribute = attributes[i],
+			    name = attribute.nodeName,
+			    value = attribute.nodeValue;
+			if (value != 'inherit'){
+				target[name] = value;
+				target[name + '_document'] = element.ownerDocument;
+			}
 		}
 		return target;
 	},
@@ -132,11 +172,12 @@ ART.SVG.Parser = new Class({
 	},
 	
 	parseColor: function(value, opacity, styles){
+		if (value == 'currentColor') value = styles.color;
 		try {
-			var color = new Color(value == 'currentColor' ? styles.color : value);
+			var color = new Color(namedColors[value] || value);
 		} catch (x){
-			return new Color('black'); // TEMP: Color unknown colors black for debugging
-			return null; // Ignore unparsable colors, TODO: log
+			// Ignore unparsable colors, TODO: log
+			return null;
 		}
 		color.alpha = opacity == null ? 1 : +opacity;
 		return color;
@@ -173,9 +214,9 @@ ART.SVG.Parser = new Class({
 		var match;
 		if (match = matchURL.exec(styles.fill)){
 			var self = this;
-			this.findByURL(element.ownerDocument, match[1], function(fill){
+			this.findByURL(styles.fill_document, match[1], function(fill){
 				var fillFunction = fill && self[fill.nodeName + 'Fill'];
-				if (fillFunction) fillFunction.call(self, fill, self.parseStyles(fill, styles), target, x, y);
+				if (fillFunction) fillFunction.call(self, fill, self.findStyles(fill), target, x, y);
 			});
 		} else {
 			target.fill(this.parseColor(styles.fill, styles['fill-opacity'], styles));
@@ -222,17 +263,17 @@ ART.SVG.Parser = new Class({
 	},
 	
 	filter: function(element, styles, target){
-		if (styles.hasOwnProperty('opacity') && styles.opacity != 1 && target.blend) target.blend(styles.opacity);
+		if (styles.opacity != 1 && target.blend) target.blend(styles.opacity);
 	},
 	
 	svgElement: function(element, styles){
 		var viewbox = element.getAttribute('viewBox'),
 		    match = matchViewBox.exec(viewbox),
-		    group = match ? new ART.Group(+match[3], +match[4]) : new ART.Group(),
 		    x = this.getLengthAttribute(element, styles, 'x', 'x'),
 		    y = this.getLengthAttribute(element, styles, 'y', 'y'),
 		    width = this.getLengthAttribute(element, styles, 'width', 'x'),
-		    height = this.getLengthAttribute(element, styles, 'height', 'y');
+		    height = this.getLengthAttribute(element, styles, 'height', 'y'),
+		    group = match ? new ART.Group(+match[3], +match[4]) : new ART.Group(width || null, height || null);
 		if (width && height) group.resizeTo(width, height); // TODO: Aspect ratio
 		if (match) group.transform(1, 0, 0, 1, -match[1], -match[2]);
 		this.container(element, styles, group);
@@ -259,8 +300,14 @@ ART.SVG.Parser = new Class({
 		placeholder.transform(1, 0, 0, 1, x, y);
 		
 		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'), function(target){
-			if (!target) return;
-			var symbol = (target.nodeName == 'symbol') ? self.svgElement(target, self.parseStyles(target, styles)) : self.parse(target, styles);
+			if (!target || target.nodeType != 1) return;
+			
+			var parseFunction = target.nodeName == 'symbol' ? self.svgElement : self[target.nodeName + 'Element'];
+			if (!parseFunction) return;
+			
+			styles = self.parseStyles(element, self.parseStyles(target, styles));
+			
+			var symbol = parseFunction.call(self, target, styles);
 			if (!symbol) return;
 			if (width && height) symbol.resizeTo(width, height); // TODO: Aspect ratio, maybe resize the placeholder instead
 			placeholder.grab(symbol);
