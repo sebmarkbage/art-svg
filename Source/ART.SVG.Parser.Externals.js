@@ -16,7 +16,7 @@ ART.SVG.Parser.implement({
 		this.pendingRequests = (this.pendingRequests || 0) + 1;
 		new Request.XML({
 		
-			url: url,
+			url: url.toString(),
 			
 			onSuccess: function(txt, doc){
 				var resolve = self.resolveURL;
