@@ -951,6 +951,7 @@ Configuration.source = {
 		path: '../Source/',
 		files: [
 			'ART.SVG.Parser',
+			'ART.SVG.Parser.Colors',
 			'ART.SVG.Parser.Paints',
 			'ART.SVG.Parser.Shapes',
 			'ART.SVG.Parser.Styles',

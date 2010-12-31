@@ -27,23 +27,6 @@ var styleSheet = function(){},
 		'filter': null,
 		'mask': null,
 		'opacity': 1
-	},
-	// Some additional colors not included in Color class
-	namedColors = {
-		crimson: '#dc143c',
-		palegreen: '#98fb98',
-		forestgreen: '#228b22',
-		royalblue: '#4169e1',
-		firebrick: '#b22222',
-		seagreen: '#2e8b57',
-		mediumblue: '#0000cd',
-		indianred: '#cd5c5c',
-		lawngreen: '#7cfc00',
-		mediumturquoise: '#48d1cc',
-		darkblue: '#00008b',
-		gold: '#ffd700',
-		lightblue: '#add8e6',
-		grey: '#808080'
 	};
 
 // Visitor
@@ -174,7 +157,7 @@ ART.SVG.Parser = new Class({
 	parseColor: function(value, opacity, styles){
 		if (value == 'currentColor') value = styles.color;
 		try {
-			var color = new Color(namedColors[value] || value);
+			var color = new Color(value);
 		} catch (x){
 			// Ignore unparsable colors, TODO: log
 			return null;
