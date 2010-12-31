@@ -315,7 +315,7 @@ ART.SVG.Parser = new Class({
 	},
 	
 	pathElement: function(element, styles){
-		var shape = new ART.Shape(element.getAttribute('d'));
+		var shape = new ART.Shape(element.getAttribute('d') || null);
 		this.shape(element, styles, shape);
 		return shape;
 	},
