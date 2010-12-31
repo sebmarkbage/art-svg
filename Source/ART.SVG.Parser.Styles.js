@@ -14,10 +14,10 @@ ART.SVG.Parser.implement({
 			css = this.css;
 		}
 		css.applyStyle(element, target);
+		for (var key in target) if (target[key] == 'inherit') delete target[key];
 		applyStyles.call(this, element, target);
 	}
 
 });
-
 
 })();
