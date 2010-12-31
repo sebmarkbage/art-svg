@@ -4,3 +4,6 @@
 [submodule "Tests/art"]
 	path = Tests/art
 	url = http://github.com/calyptus/art.git
+[submodule "Tests/sheet.js"]
+	path = Tests/sheet.js
+	url = http://github.com/subtleGradient/Sheet.js.git

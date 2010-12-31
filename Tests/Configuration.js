@@ -10,27 +10,27 @@ Configuration.presets = {
 
 	'samples': {
 		sets: ['samples'],
-		source: ['core-1.3-base', 'core-1.3-client', 'utils', 'color', 'art-0.9', 'art-svg']
+		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
 	},
 
 	'svg-1.1-full': {
 		sets: ['svg-1.1-full', 'svg-1.1-basic', 'svg-1.1-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'utils', 'color', 'art-0.9', 'art-svg']
+		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
 	},
 
 	'svg-1.1-basic': {
 		sets: ['svg-1.1-basic', 'svg-1.1-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'utils', 'color', 'art-0.9', 'art-svg']
+		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
 	},
 
 	'svg-1.1-tiny': {
 		sets: ['svg-1.1-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'utils', 'color', 'art-0.9', 'art-svg']
+		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
 	},
 	
 	'svg-1.2-tiny': {
 		sets: ['svg-1.2-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'utils', 'color', 'art-0.9', 'art-svg']
+		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
 	}
 
 };
@@ -914,7 +914,16 @@ Configuration.source = {
 		path: 'utils/',
 		files: [
 			'URI',
-			'Request.XML'
+			'Request.XML',
+			'Sheet.Cascade'
+		]
+	},
+	
+	'sheet': {
+		path: 'sheet.js/Source/',
+		files: [
+			'sg-regex-tools',
+			'SheetParser.CSS'
 		]
 	},
 	

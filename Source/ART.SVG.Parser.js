@@ -78,7 +78,7 @@ ART.SVG.Parser = new Class({
 		styleSheet.prototype = styles;
 		var newSheet = new styleSheet();
 		for (var key in nonInheritedStyles) newSheet[key] = nonInheritedStyles[key];
-		this.fillElementStyles(element, newSheet);
+		this.applyStyles(element, newSheet);
 		if (newSheet.hasOwnProperty('font-size')){
 			var newFontSize = this.parseLength(newSheet['font-size'], styles, 'font');
 			if (newFontSize != null) newSheet['font-size'] = newFontSize;
@@ -95,7 +95,7 @@ ART.SVG.Parser = new Class({
 		return this.parseStyles(element, styles);
 	},
 	
-	fillElementStyles: function(element, target){
+	applyStyles: function(element, target){
 		var attributes = element.attributes;
 		for (var i = 0, l = attributes.length; i < l; i++){
 			var attribute = attributes[i],
