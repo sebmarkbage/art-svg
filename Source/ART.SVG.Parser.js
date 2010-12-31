@@ -68,7 +68,7 @@ ART.SVG.Parser = new Class({
 				this.container(element, this.parseStyles(element, styles), canvas);
 			return canvas;
 		}
-		if (element.nodeType != 1) return null;
+		if (element.nodeType != 1 || element.getAttribute('requiredExtensions') || element.getAttribute('systemLanguage') != null) return null;
 		styles = this.parseStyles(element, styles);
 		var parseFunction = this[element.nodeName + 'Element'];
 		return parseFunction ? parseFunction.call(this, element, styles) : null;
