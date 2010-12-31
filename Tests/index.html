@@ -15,7 +15,7 @@
 	<script>
 	(function(){
 		for (var name in Configuration.presets){
-			document.write('<li><a href="runner.html?preset=' + name + '">&rarr; ' + name + ': [' + Configuration.presets[name].sets.join(', ') + '] Tests</a></li>');
+			document.write('<li><a href="runner.html?preset=' + name + '">&rarr; ' + name + ': [<span class="sets">' + Configuration.presets[name].sets.join(', ') + '</span>]</a></li>');
 		}
 	})();
 	</script>

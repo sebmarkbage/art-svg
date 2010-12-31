@@ -5,32 +5,191 @@ var Configuration = context.Configuration = {};
 // Runner name
 Configuration.name = 'ART SVG Parser';
 
+Configuration.defaultPresets = {
+	browser: 'samples'
+};
+
+var source = ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg'];
+
 // Presets - combine the sets and the source to a preset to easily run a test
 Configuration.presets = {
 
 	'samples': {
 		sets: ['samples'],
-		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
+		source: source
+	},
+
+	'svg-1.1-all': {
+		sets: [
+			'svg-1.1-styling-f',
+			'svg-1.1-struct-f',
+			'svg-1.1-filters-f',
+			'svg-1.1-interact-f',
+			'svg-1.1-masking-f',
+			'svg-1.1-painting-f',
+			'svg-1.1-paths-f',
+			'svg-1.1-text-f',
+			'svg-1.1-animate-b',
+			'svg-1.1-color-b',
+			'svg-1.1-coords-b',
+			'svg-1.1-filters-b',
+			'svg-1.1-fonts-b',
+			'svg-1.1-interact-b',
+			'svg-1.1-linking-b',
+			'svg-1.1-masking-b',
+			'svg-1.1-painting-b',
+			'svg-1.1-script-b',
+			'svg-1.1-struct-b',
+			'svg-1.1-styling-b',
+			'svg-1.1-text-b',
+			'svg-1.1-animate-t',
+			'svg-1.1-color-t',
+			'svg-1.1-coords-t',
+			'svg-1.1-fonts-t',
+			'svg-1.1-interact-t',
+			'svg-1.1-painting-t',
+			'svg-1.1-paths-t',
+			'svg-1.1-shapes-t',
+			'svg-1.1-struct-t',
+			'svg-1.1-styling-t',
+			'svg-1.1-text-t'
+		],
+		source: source
+	},
+	
+	'svg-1.1-filters': {
+		sets: [
+			'svg-1.1-filters-f',
+			'svg-1.1-filters-b'
+		],
+		source: source
+	},
+
+	'svg-1.1-interact': {
+		sets: [
+			'svg-1.1-linking-b',
+			'svg-1.1-interact-f',
+			'svg-1.1-interact-b',
+			'svg-1.1-interact-t',
+			'svg-1.1-animate-b',
+			'svg-1.1-animate-t',
+			'svg-1.1-script-b'
+		],
+		source: source
+	},
+
+	'svg-1.1-coords': {
+		sets: [
+			'svg-1.1-coords-b',
+			'svg-1.1-coords-t'
+		],
+		source: source
+	},
+	
+	'svg-1.1-painting': {
+		sets: [
+			'svg-1.1-painting-f',
+			'svg-1.1-painting-b',
+			'svg-1.1-painting-t',
+			'svg-1.1-masking-b',
+			'svg-1.1-masking-f'
+		],
+		source: source
+	},
+
+	'svg-1.1-paths': {
+		sets: [
+			'svg-1.1-paths-f',
+			'svg-1.1-paths-t',
+			'svg-1.1-shapes-t'
+		],
+		source: source
+	},
+
+	'svg-1.1-struct': {
+		sets: [
+			'svg-1.1-struct-f',
+			'svg-1.1-struct-b',
+			'svg-1.1-struct-t'
+		],
+		source: source
+	},
+
+	'svg-1.1-styling': {
+		sets: [
+			'svg-1.1-styling-f',
+			'svg-1.1-styling-b',
+			'svg-1.1-styling-t',
+			'svg-1.1-color-b',
+			'svg-1.1-color-t'
+		],
+		source: source
+	},
+
+	'svg-1.1-text': {
+		sets: [
+			'svg-1.1-text-f',
+			'svg-1.1-text-b',
+			'svg-1.1-text-t',
+			'svg-1.1-fonts-b',
+			'svg-1.1-fonts-t'
+		],
+		source: source
 	},
 
 	'svg-1.1-full': {
-		sets: ['svg-1.1-full', 'svg-1.1-basic', 'svg-1.1-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
+		sets: [
+			'svg-1.1-styling-f',
+			'svg-1.1-struct-f',
+			'svg-1.1-filters-f',
+			'svg-1.1-interact-f',
+			'svg-1.1-masking-f',
+			'svg-1.1-painting-f',
+			'svg-1.1-paths-f',
+			'svg-1.1-text-f'
+		],
+		source: source
 	},
 
 	'svg-1.1-basic': {
-		sets: ['svg-1.1-basic', 'svg-1.1-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
+		sets: [
+			'svg-1.1-animate-b',
+			'svg-1.1-color-b',
+			'svg-1.1-coords-b',
+			'svg-1.1-filters-b',
+			'svg-1.1-fonts-b',
+			'svg-1.1-interact-b',
+			'svg-1.1-linking-b',
+			'svg-1.1-masking-b',
+			'svg-1.1-painting-b',
+			'svg-1.1-script-b',
+			'svg-1.1-struct-b',
+			'svg-1.1-styling-b',
+			'svg-1.1-text-b'
+		],
+		source: source
 	},
 
 	'svg-1.1-tiny': {
-		sets: ['svg-1.1-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
+		sets: [
+			'svg-1.1-animate-t',
+			'svg-1.1-color-t',
+			'svg-1.1-coords-t',
+			'svg-1.1-fonts-t',
+			'svg-1.1-interact-t',
+			'svg-1.1-painting-t',
+			'svg-1.1-paths-t',
+			'svg-1.1-shapes-t',
+			'svg-1.1-struct-t',
+			'svg-1.1-styling-t',
+			'svg-1.1-text-t'
+		],
+		source: source
 	},
 	
 	'svg-1.2-tiny': {
 		sets: ['svg-1.2-tiny'],
-		source: ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg']
+		source: source
 	}
 
 };
@@ -52,47 +211,121 @@ Configuration.sets = {
 			'Clipping'
 		]
 	},
-
-	'svg-1.1-full': {
+	
+	// SVG 1.1 Full Profile
+	
+	'svg-1.1-styling-f': {
 		keyPath: 'SVG1.1/png/full-',
 		testPath: 'SVG1.1/svg/',
 		files: [
 			'color-prof-01-f',
 			'color-prop-02-f',
-			'extend-namespace-01-f',
+			'styling-css-04-f'
+		]
+	},
+
+	'svg-1.1-struct-f': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'extend-namespace-01-f'
+		]
+	},
+
+	'svg-1.1-filters-f': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'filters-conv-01-f',
 			'filters-diffuse-01-f',
 			'filters-displace-01-f',
 			'filters-light-01-f',
 			'filters-morph-01-f',
 			'filters-specular-01-f',
-			'filters-turb-01-f',
-			'interact-cursor-01-f',
-			'masking-intro-01-f',
-			'masking-path-05-f',
-			'painting-marker-01-f',
-			'painting-marker-02-f',
-			'painting-marker-03-f',
-			'paths-data-03-f',
-			'styling-css-04-f',
-			'text-tselect-02-f'
+			'filters-turb-01-f'
 		]
 	},
 
-	'svg-1.1-basic': {
+	'svg-1.1-interact-f': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'interact-cursor-01-f'
+		]
+	},
+
+	'svg-1.1-masking-f': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'masking-intro-01-f',
+			'masking-path-05-f'
+		]
+	},
+
+	'svg-1.1-painting-f': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'painting-marker-01-f',
+			'painting-marker-02-f',
+			'painting-marker-03-f'
+		]
+	},
+
+	'svg-1.1-paths-f': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'paths-data-03-f'
+		]
+	},
+
+	'svg-1.1-text-f': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'text-tselect-02-f'
+		]
+	},
+	
+	// SVG 1.1 Basic Profile
+
+	'svg-1.1-animate-b': {
 		keyPath: 'SVG1.1/png/full-',
 		testPath: 'SVG1.1/svg/',
 		files: [
 			'animate-elem-22-b',
-			'animate-elem-29-b',
-			'color-prop-01-b',
+			'animate-elem-29-b'
+		]
+	},
+
+	'svg-1.1-color-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'color-prop-01-b'
+		]
+	},
+
+	'svg-1.1-coords-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'coords-trans-01-b',
 			'coords-units-01-b',
 			'coords-units-02-b',
 			'coords-units-03-b',
 			'coords-viewattr-01-b',
 			'coords-viewattr-02-b',
-			'coords-viewattr-03-b',
+			'coords-viewattr-03-b'
+		]
+	},
+
+	'svg-1.1-filters-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'filters-blend-01-b',
 			'filters-color-01-b',
 			'filters-composite-02-b',
@@ -102,29 +335,64 @@ Configuration.sets = {
 			'filters-gauss-01-b',
 			'filters-image-01-b',
 			'filters-offset-01-b',
-			'filters-tile-01-b',
+			'filters-tile-01-b'
+		]
+	},
+
+	'svg-1.1-fonts-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'fonts-elem-03-b',
 			'fonts-elem-04-b',
-			'fonts-elem-07-b',
+			'fonts-elem-07-b'
+		]
+	},
+
+	'svg-1.1-interact-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'interact-dom-01-b',
 			'interact-events-01-b',
 			'interact-order-01-b',
 			'interact-order-02-b',
-			'interact-order-03-b',
+			'interact-order-03-b'
+		]
+	},
+
+	'svg-1.1-linking-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'linking-a-01-b',
 			'linking-a-02-b',
 			'linking-a-03-b',
 			'linking-uri-01-b',
-			'linking-uri-02-b',
+			'linking-uri-02-b'
+		]
+	},
+
+	'svg-1.1-masking-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'masking-mask-01-b',
 			'masking-opacity-01-b',
 			'masking-path-01-b',
 			'masking-path-02-b',
 			'masking-path-03-b',
-			'masking-path-04-b',
-			'metadata-example-01-b',
+			'masking-path-04-b'
+		]
+	},
+
+	'svg-1.1-painting-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'painting-fill-05-b',
 			'painting-render-01-b',
+			'render-groups-01-b',
 			'pservers-grad-01-b',
 			'pservers-grad-02-b',
 			'pservers-grad-03-b',
@@ -144,12 +412,26 @@ Configuration.sets = {
 			'pservers-grad-17-b',
 			'pservers-grad-18-b',
 			'pservers-grad-19-b',
-			'pservers-pattern-01-b',
-			'render-groups-01-b',
+			'pservers-pattern-01-b'
+		]
+	},
+
+	'svg-1.1-script-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'script-handle-01-b',
 			'script-handle-02-b',
 			'script-handle-03-b',
-			'script-handle-04-b',
+			'script-handle-04-b'
+		]
+	},
+
+	'svg-1.1-struct-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'metadata-example-01-b',
 			'struct-dom-01-b',
 			'struct-dom-02-b',
 			'struct-dom-03-b',
@@ -161,12 +443,27 @@ Configuration.sets = {
 			'struct-image-05-b',
 			'struct-symbol-01-b',
 			'struct-use-05-b',
+			'types-basicDOM-01-b'
+		]
+	},
+
+	'svg-1.1-styling-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'styling-css-01-b',
 			'styling-css-02-b',
 			'styling-css-03-b',
 			'styling-css-05-b',
 			'styling-css-06-b',
-			'styling-inherit-01-b',
+			'styling-inherit-01-b'
+		]
+	},
+
+	'svg-1.1-text-b': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'text-align-01-b',
 			'text-align-02-b',
 			'text-align-03-b',
@@ -185,12 +482,13 @@ Configuration.sets = {
 			'text-text-08-b',
 			'text-tref-01-b',
 			'text-tselect-01-b',
-			'text-tspan-01-b',
-			'types-basicDOM-01-b'
+			'text-tspan-01-b'
 		]
 	},
+	
+	// SVG 1.1 Tiny Profile
 
-	'svg-1.1-tiny': {
+	'svg-1.1-animate-t': {
 		keyPath: 'SVG1.1/png/full-',
 		testPath: 'SVG1.1/svg/',
 		files: [
@@ -249,15 +547,36 @@ Configuration.sets = {
 			'animate-elem-82-t',
 			'animate-elem-83-t',
 			'animate-elem-84-t',
-			'animate-elem-85-t',
-			'color-prop-03-t',
+			'animate-elem-85-t'
+		]
+	},
+	
+	'svg-1.1-color-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'color-prop-03-t'
+		]
+	},
+	
+	'svg-1.1-coords-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'coords-coord-01-t',
 			'coords-coord-02-t',
 			'coords-trans-02-t',
 			'coords-trans-03-t',
 			'coords-trans-04-t',
 			'coords-trans-05-t',
-			'coords-trans-06-t',
+			'coords-trans-06-t'
+		]
+	},
+	
+	'svg-1.1-fonts-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'fonts-desc-02-t',
 			'fonts-elem-01-t',
 			'fonts-elem-02-t',
@@ -266,12 +585,33 @@ Configuration.sets = {
 			'fonts-glyph-02-t',
 			'fonts-glyph-03-t',
 			'fonts-glyph-04-t',
-			'fonts-kern-01-t',
-			'interact-zoom-01-t',
+			'fonts-kern-01-t'
+		]
+	},
+	
+	'svg-1.1-interact-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'interact-zoom-01-t'
+		]
+	},
+	
+	'svg-1.1-linking-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'linking-a-04-t',
 			'linking-a-05-t',
 			'linking-a-07-t',
-			'linking-uri-03-t',
+			'linking-uri-03-t'
+		]
+	},
+	
+	'svg-1.1-painting-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'painting-fill-01-t',
 			'painting-fill-02-t',
 			'painting-fill-03-t',
@@ -281,6 +621,20 @@ Configuration.sets = {
 			'painting-stroke-03-t',
 			'painting-stroke-04-t',
 			'painting-stroke-07-t',
+			'render-elems-01-t',
+			'render-elems-02-t',
+			'render-elems-03-t',
+			'render-elems-06-t',
+			'render-elems-07-t',
+			'render-elems-08-t',
+			'render-groups-03-t'
+		]
+	},
+	
+	'svg-1.1-paths-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'paths-data-01-t',
 			'paths-data-02-t',
 			'paths-data-04-t',
@@ -293,14 +647,14 @@ Configuration.sets = {
 			'paths-data-12-t',
 			'paths-data-13-t',
 			'paths-data-14-t',
-			'paths-data-15-t',
-			'render-elems-01-t',
-			'render-elems-02-t',
-			'render-elems-03-t',
-			'render-elems-06-t',
-			'render-elems-07-t',
-			'render-elems-08-t',
-			'render-groups-03-t',
+			'paths-data-15-t'
+		]
+	},
+	
+	'svg-1.1-shapes-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'shapes-circle-01-t',
 			'shapes-circle-02-t',
 			'shapes-ellipse-01-t',
@@ -310,7 +664,14 @@ Configuration.sets = {
 			'shapes-polygon-01-t',
 			'shapes-polyline-01-t',
 			'shapes-rect-01-t',
-			'shapes-rect-02-t',
+			'shapes-rect-02-t'
+		]
+	},
+	
+	'svg-1.1-struct-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'struct-cond-01-t',
 			'struct-cond-02-t',
 			'struct-cond-03-t',
@@ -332,8 +693,22 @@ Configuration.sets = {
 			'struct-image-09-t',
 			'struct-image-10-t',
 			'struct-use-01-t',
-			'struct-use-03-t',
-			'styling-pres-01-t',
+			'struct-use-03-t'
+		]
+	},
+	
+	'svg-1.1-styling-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
+			'styling-pres-01-t'
+		]
+	},
+	
+	'svg-1.1-text-t': {
+		keyPath: 'SVG1.1/png/full-',
+		testPath: 'SVG1.1/svg/',
+		files: [
 			'text-fonts-01-t',
 			'text-fonts-02-t',
 			'text-fonts-03-t',
@@ -348,6 +723,8 @@ Configuration.sets = {
 			'text-ws-02-t'
 		]
 	},
+	
+	// SVG 1.2 Tiny Profile
 
 	'svg-1.2-tiny': {
 		keyPath: 'SVG1.2/png/',

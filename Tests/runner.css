@@ -95,6 +95,15 @@ ul#prebuilt li a:hover {
 	background-color: #eee;
 }
 
+ul#prebuilt li .sets {
+	font-size:0.5em;
+	max-width: 30em;
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /* Tests */
 
 .test-results {
