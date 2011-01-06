@@ -5,8 +5,9 @@ ART.SVG.Parser.implement({
 		    y = this.getLengthAttribute(element, styles, 'y', 'y'),
 		    w = this.getLengthAttribute(element, styles, 'width', 'x'),
 		    h = this.getLengthAttribute(element, styles, 'height', 'y'),
-		    r = (this.getLengthAttribute(element, styles, 'rx', 'x') +
-		    	this.getLengthAttribute(element, styles, 'ry', 'y')) / 2,
+		    rx = this.getLengthAttribute(element, styles, 'rx', 'x'),
+		    ry = this.getLengthAttribute(element, styles, 'ry', 'y'),
+		    r = rx && ry ? (rx + ry) / 2 : rx || ry, // TODO: Use custom path
 		    shape = new ART.Rectangle(w, h, r);
 		this.shape(element, styles, shape, x, y);
 		return shape;
