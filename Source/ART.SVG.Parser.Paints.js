@@ -8,17 +8,16 @@ ART.SVG.Parser.implement({
 				result[attribute.nodeName] = attribute.nodeValue;
 			}
 			if (element.childNodes.length > 0) result.container = element;
-			callback(result);
+			callback.call(this, result);
 		};
 		
 		var href = element.getAttribute('xlink:href');
-		if (!href){ cb({}); return; }
+		if (!href){ cb.call(this, {}); return; }
 		
-		var self = this;
 		this.findByURL(element.ownerDocument, href, function(parent){
-			if (!parent) cb({});
-			else self.findLinkedAttributes(parent, function(parentResult){
-				cb(parentResult);
+			if (!parent) cb.call(this, {});
+			else this.findLinkedAttributes(parent, function(parentResult){
+				cb.call(this, parentResult);
 			});
 		});
 	},

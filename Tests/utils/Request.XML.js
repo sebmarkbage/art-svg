@@ -30,6 +30,7 @@ Request.XML = new Class({
 				xml.resolveExternals = false;
 				xml.validateOnParse = false;
 				xml.async = false;
+				xml.preserveWhiteSpace = true;
 				xml.loadXML(text);
 			}
 		} catch (e){

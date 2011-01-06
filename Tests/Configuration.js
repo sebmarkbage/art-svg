@@ -1333,6 +1333,7 @@ Configuration.source = {
 			'ART.SVG.Parser.Shapes',
 			'ART.SVG.Parser.Styles',
 			'ART.SVG.Parser.Text',
+			'ART.SVG.Parser.Fonts',
 			'ART.SVG.Parser.Markers',
 			'ART.SVG.Parser.Externals'
 		]

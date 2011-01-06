@@ -4,7 +4,7 @@ if (!ART.SVG) ART.SVG = {};
 
 // Regular Expressions
 
-var matchURL = /^\s*url\(\s*([^\)]*?)\s*\)/,
+var matchURL = /^\s*url\(["'\s]*([^\)]*?)["'\s]*\)/,
 	requiredNumber = '(?:\\s+|\\s*,\\s*)([^\\s,\\)]+)';
 	number = '(?:' + requiredNumber + ')?',
 	matchViewBox = new RegExp('^\\s*([^\\s,]+)' + requiredNumber + requiredNumber + requiredNumber),
@@ -15,10 +15,12 @@ var dpi = 72, emToEx = 0.5;
 
 var styleSheet = function(){},
 	defaultStyles = {
-		viewportWidth: 500,
-		viewportHeight: 500,
+		'viewportWidth': 500,
+		'viewportHeight': 500,
+		'font-family': 'Arial',
 		'font-size': 12,
-		color: 'black'
+		'color': 'black',
+		'fill': 'black'
 	},
 	nonInheritedStyles = {
 		'stop-color': 'black',
@@ -34,10 +36,12 @@ var styleSheet = function(){},
 ART.SVG.Parser = new Class({
 
 	parse: function(element, styles){
-		if (!styles) styles = this.findStyles(element);
+		if (!styles)
+			styles = this.findStyles(element);
 		else
 			for (var style in defaultStyles)
-				if (!(styles in styles)) styles[styles] = defaultStyles[styles];
+				if (!(style in styles))
+					styles[style] = defaultStyles[style];
 		
 		if (element.documentElement){
 			element = element.documentElement;
@@ -104,7 +108,7 @@ ART.SVG.Parser = new Class({
 		var root = document.documentElement, node = this.lastSweep || root;
 		treewalker: while (node){
 			if (node.nodeType == 1){
-				var newID = node.getAttribute('id');
+				var newID = node.getAttribute('id') || node.getAttribute('xml:id');
 				if (newID && ids[newID] == null) ids[newID] = node;
 				if (newID == id){
 					this.lastSweep = node;
@@ -125,7 +129,7 @@ ART.SVG.Parser = new Class({
 	},
 	
 	findByURL: function(document, url, callback){
-		callback(url && url[0] == '#' ? this.findById(document, url.substr(1)) : null);
+		callback.call(this, url && url[0] == '#' ? this.findById(document, url.substr(1)) : null);
 	},
 
 	resolveURL: function(url){
@@ -173,7 +177,7 @@ ART.SVG.Parser = new Class({
 	container: function(element, styles, container){
 		if (container.width != null) styles.viewportWidth = container.width;
 		if (container.height != null) styles.viewportHeight = container.height;
-		this.filter(element, styles, container);
+		this.filter(styles, container);
 		var node = element.firstChild;
 		while (node){
 			var art = this.parse(node, styles);
@@ -186,33 +190,36 @@ ART.SVG.Parser = new Class({
 	shape: function(element, styles, target, x, y){
 		this.transform(element, target);
 		target.transform(1, 0, 0, 1, x, y);
-		this.fill(element, styles, target, x, y);
-		this.stroke(element, styles, target);
-		this.filter(element, styles, target);
+		this.fill(styles, target, x, y);
+		this.stroke(styles, target);
+		this.filter(styles, target);
 		return target;
 	},
 	
-	fill: function(element, styles, target, x, y){
+	fill: function(styles, target, x, y){
 		if (!styles.fill || styles.fill == 'none') return;
 		var match;
 		if (match = matchURL.exec(styles.fill)){
-			var self = this;
 			this.findByURL(styles.fill_document, match[1], function(fill){
-				var fillFunction = fill && self[fill.nodeName + 'Fill'];
-				if (fillFunction) fillFunction.call(self, fill, self.findStyles(fill), target, x, y);
+				var fillFunction = fill && this[fill.nodeName + 'Fill'];
+				if (fillFunction) fillFunction.call(this, fill, this.findStyles(fill), target, x, y);
 			});
 		} else {
 			target.fill(this.parseColor(styles.fill, styles['fill-opacity'], styles));
 		}
 	},
 	
-	stroke: function(element, styles, target){
+	stroke: function(styles, target){
 		if (!styles.stroke || styles.stroke == 'none' || matchURL.test(styles.stroke)) return; // Advanced stroke colors are not supported, TODO: log
 		var color = this.parseColor(styles.stroke, styles['stroke-opacity'], styles),
 			width = this.parseLength(styles['stroke-width'], styles),
 			cap = styles['stroke-linecap'] || 'butt',
 			join = styles['stroke-linejoin'] || 'miter';
 		target.stroke(color, width == null ? 1 : width, cap, join);
+	},
+
+	filter: function(styles, target){
+		if (styles.opacity != 1 && target.blend) target.blend(styles.opacity);
 	},
 
 	transform: function(element, target){
@@ -245,10 +252,6 @@ ART.SVG.Parser = new Class({
 		}
 	},
 	
-	filter: function(element, styles, target){
-		if (styles.opacity != 1 && target.blend) target.blend(styles.opacity);
-	},
-	
 	svgElement: function(element, styles){
 		var viewbox = element.getAttribute('viewBox'),
 		    match = matchViewBox.exec(viewbox),
@@ -272,8 +275,7 @@ ART.SVG.Parser = new Class({
 	},
 	
 	useElement: function(element, styles){
-		var self = this,
-		    placeholder = new ART.Group(),
+		var placeholder = new ART.Group(),
 		    x = this.getLengthAttribute(element, styles, 'x', 'x'),
 		    y = this.getLengthAttribute(element, styles, 'y', 'y'),
 		    width = this.getLengthAttribute(element, styles, 'width', 'x'),
@@ -285,12 +287,12 @@ ART.SVG.Parser = new Class({
 		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'), function(target){
 			if (!target || target.nodeType != 1) return;
 			
-			var parseFunction = target.nodeName == 'symbol' ? self.svgElement : self[target.nodeName + 'Element'];
+			var parseFunction = target.nodeName == 'symbol' ? this.svgElement : this[target.nodeName + 'Element'];
 			if (!parseFunction) return;
 			
-			styles = self.parseStyles(element, self.parseStyles(target, styles));
+			styles = this.parseStyles(element, this.parseStyles(target, styles));
 			
-			var symbol = parseFunction.call(self, target, styles);
+			var symbol = parseFunction.call(this, target, styles);
 			if (!symbol) return;
 			if (width && height) symbol.resizeTo(width, height); // TODO: Aspect ratio, maybe resize the placeholder instead
 			placeholder.grab(symbol);
@@ -332,16 +334,23 @@ ART.SVG.Parser = new Class({
 		
 		if (clipPath && (match = matchURL.exec(clipPath)) && match[1][0] == '#'){
 			var clip = this.findById(element.ownerDocument, match[1].substr(1));
-			if (clip && (clip = this.switchElement(clip, styles)) && typeof clip.fillImage == 'function'){
-				clip.fillImage(href, width, height);
-				image = clip;
+			if (clip){
+				image = this.switchElement(clip, styles);
+				if (image){
+					if (typeof image.fillImage == 'function'){
+						image.fillImage(href, width, height);
+						if (image.stroke) image.stroke(0);
+					} else {
+						image = null;
+					}
+				}
 			}
 		}
 		if (!image){
 			//image = new ART.Image(href, width, height); TODO
 			image = new ART.Rectangle(width, height).fillImage(href, width, height);
 		}
-		this.filter(element, styles, image);
+		this.filter(styles, image);
 		this.transform(element, image);
 		image.transform(1, 0, 0, 1, x, y);
 		return image;

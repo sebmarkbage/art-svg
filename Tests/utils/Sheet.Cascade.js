@@ -27,16 +27,27 @@ function sortRules(rules){
 	});
 };
 
+function nodeContent(node){
+	var n = node.firstChild, text = '';
+	while (n){
+		text += n.nodeValue;
+		n = n.nextSibling;
+	}
+	return text;
+}
+
 Sheet.Cascade = function(){
 	this.rules = [];
+	this.cssRules = [];
 };
 
 Sheet.Cascade.prototype = {
 
 	addSheet: function(sheet){
-		var rules = sheet.cssRules || CSS.parse(sheet.innerHTML || (sheet.firstChild && sheet.firstChild.nodeValue) || sheet);
+		var rules = sheet.cssRules || CSS.parse(sheet.innerHTML || nodeContent(sheet) || sheet);
 		for (var i = 0, l = rules.length; i < l; i++){
 			var rule = rules[i];
+			this.cssRules.push(rule);
 			this.addRule(rule.selectorText, rule.style);
 		}
 	},
