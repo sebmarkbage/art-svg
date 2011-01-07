@@ -19,6 +19,11 @@ Configuration.presets = {
 		source: source
 	},
 
+	'art-tests': {
+		sets: ['art-tests'],
+		source: source
+	},
+
 	'svg-1.1-all': {
 		sets: [
 			'svg-1.1-styling-f',
@@ -207,7 +212,14 @@ Configuration.sets = {
 		testPath: 'Samples/',
 		files: [
 			'Tiger',
-			'Lion',
+			'Lion'
+		]
+	},
+
+	'art-tests': {
+		keyPath: 'Tests/',
+		testPath: 'Tests/',
+		files: [
 			'Clipping'
 		]
 	},
