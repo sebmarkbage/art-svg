@@ -1,7 +1,7 @@
 (function(){
 
 function fontStyles(styles){
-	var font = {}, isFontStyle = /^(font|text-d|kerning|letter|word)/;
+	var font = {}, isFontStyle = /^(font|text-d|kerning|letter|word)[^\_]*$/;
 	for (var style in styles)
 		if (isFontStyle.test(style))
 			font[style] = styles[style] + (style == 'font-size' ? 'px' : '');
