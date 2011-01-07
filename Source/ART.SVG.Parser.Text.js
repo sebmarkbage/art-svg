@@ -88,7 +88,7 @@ ART.SVG.Parser.implement({
 	},
 
 	textPathText: function(element, styles, row, target, continuation){
-		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'), function(path){
+		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href') || element.getAttribute('href'), function(path){
 			if (!path || !(path = path.getAttribute('d'))) return;
 			var text = this.elementTextContent(element, styles);
 			this.createText(text, styles, null, target, path, function(){
@@ -100,7 +100,8 @@ ART.SVG.Parser.implement({
 	trefText: function(element, styles, row, target, continuation){
 		row = progressRow.call(this, row, element, styles);
 
-		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'), function(ref){
+		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href') || element.getAttribute('href'), function(ref){
+			if (!ref) return continuation(row);
 			var text = this.elementTextContent(ref, styles);
 			this.createText(text, styles, row, target, null, function(shape){
 				if (shape){

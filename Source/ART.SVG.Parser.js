@@ -284,7 +284,7 @@ ART.SVG.Parser = new Class({
 		this.transform(element, placeholder);
 		placeholder.transform(1, 0, 0, 1, x, y);
 		
-		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href'), function(target){
+		this.findByURL(element.ownerDocument, element.getAttribute('xlink:href') || element.getAttribute('href'), function(target){
 			if (!target || target.nodeType != 1) return;
 			
 			var parseFunction = target.nodeName == 'symbol' ? this.svgElement : this[target.nodeName + 'Element'];
@@ -323,7 +323,7 @@ ART.SVG.Parser = new Class({
 	},
 	
 	imageElement: function(element, styles){
-		var href = this.resolveURL(element.getAttribute('xlink:href')),
+		var href = this.resolveURL(element.getAttribute('xlink:href') || element.getAttribute('href')),
 		    width = this.getLengthAttribute(element, styles, 'width', 'x'),
 		    height = this.getLengthAttribute(element, styles, 'height', 'y'),
 		    x = this.getLengthAttribute(element, styles, 'x', 'x'),

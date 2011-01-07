@@ -11,7 +11,7 @@ ART.SVG.Parser.implement({
 			callback.call(this, result);
 		};
 		
-		var href = element.getAttribute('xlink:href');
+		var href = element.getAttribute('xlink:href') || element.getAttribute('href');
 		if (!href){ cb.call(this, {}); return; }
 		
 		this.findByURL(element.ownerDocument, href, function(parent){
