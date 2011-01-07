@@ -28,7 +28,8 @@ var styleSheet = function(){},
 		'clip-path': null,
 		'filter': null,
 		'mask': null,
-		'opacity': 1
+		'opacity': 1,
+		'cursor': null
 	};
 
 // Visitor
@@ -178,6 +179,7 @@ ART.SVG.Parser = new Class({
 		if (container.width != null) styles.viewportWidth = container.width;
 		if (container.height != null) styles.viewportHeight = container.height;
 		this.filter(styles, container);
+		this.describe(element, styles, container);
 		var node = element.firstChild;
 		while (node){
 			var art = this.parse(node, styles);
@@ -193,6 +195,7 @@ ART.SVG.Parser = new Class({
 		this.fill(styles, target, x, y);
 		this.stroke(styles, target);
 		this.filter(styles, target);
+		this.describe(element, styles, target);
 		return target;
 	},
 	
@@ -220,6 +223,16 @@ ART.SVG.Parser = new Class({
 
 	filter: function(styles, target){
 		if (styles.opacity != 1 && target.blend) target.blend(styles.opacity);
+	},
+	
+	describe: function(element, styles, target){
+		var node = element.firstChild, title = '';
+		if (element.nodeName != 'svg')
+			while (node){
+				if (node.nodeName == 'title') title += node.firstChild && node.firstChild.nodeValue;
+				node = node.nextSibling;
+			}
+		if (styles.cursor || title) target.indicate(styles.cursor, title);
 	},
 
 	transform: function(element, target){
@@ -351,6 +364,7 @@ ART.SVG.Parser = new Class({
 			image = new ART.Rectangle(width, height).fillImage(href, width, height);
 		}
 		this.filter(styles, image);
+		this.describe(element, styles, image);
 		this.transform(element, image);
 		image.transform(1, 0, 0, 1, x, y);
 		return image;
