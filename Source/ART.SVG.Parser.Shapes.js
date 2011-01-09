@@ -3,13 +3,30 @@ ART.SVG.Parser.implement({
 	rectElement: function(element, styles){
 		var x = this.getLengthAttribute(element, styles, 'x', 'x'),
 		    y = this.getLengthAttribute(element, styles, 'y', 'y'),
-		    w = this.getLengthAttribute(element, styles, 'width', 'x'),
-		    h = this.getLengthAttribute(element, styles, 'height', 'y'),
+		    w = +this.getLengthAttribute(element, styles, 'width', 'x'),
+		    h = +this.getLengthAttribute(element, styles, 'height', 'y'),
 		    rx = this.getLengthAttribute(element, styles, 'rx', 'x'),
 		    ry = this.getLengthAttribute(element, styles, 'ry', 'y'),
-		    r = rx && ry ? (rx + ry) / 2 : rx || ry, // TODO: Use custom path
-		    shape = new ART.Rectangle(w, h, r);
-		if (w == 0 || h == 0) return null;
+		    shape;
+		if (!w || !h) return null;
+		if (rx > w / 2) rx = w / 2;
+		if (ry > h / 2) ry = h / 2; 
+		if (rx && ry && rx != ry){
+			shape = new ART.Shape(
+				new ART.Path()
+				.move(0, ry)
+				.arc(rx, -ry)
+				.line(w - rx - rx, 0)
+				.arc(rx, ry)
+				.line(0, h - ry - ry)
+				.arc(-rx, ry)
+				.line(-w + rx + rx, 0)
+				.arc(-rx, -ry)
+				.line(0, -h + ry + ry)
+			);
+		} else {
+			shape = new ART.Rectangle(w, h, rx || ry);
+		}
 		this.shape(element, styles, shape, x, y);
 		return shape;
 	},
