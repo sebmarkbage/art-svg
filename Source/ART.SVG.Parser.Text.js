@@ -7,7 +7,7 @@ function fontStyles(styles){
 			font[style] = styles[style] + (style == 'font-size' ? 'px' : '');
 	// Iffy
 	font['font-weight'] = (font['font-weight'] > 500 || font['font-weight'] == 'bold' || font['font-weight'] == 'bolder') ? 'bold' : 'normal';
-	font['font-style'] = font['font-style'] == 'oblique' ? 'italic' : 'normal';
+	font['font-style'] = font['font-style'] == 'oblique' || font['font-style'] == 'italic' ? 'italic' : 'normal';
 	return font;
 };
 
