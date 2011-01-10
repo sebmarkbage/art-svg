@@ -195,6 +195,7 @@ ART.SVG.Parser = new Class({
 		this.fill(styles, target, x, y);
 		this.stroke(styles, target);
 		this.filter(styles, target);
+		if (styles.visibility == 'hidden') target.hide();
 		this.describe(element, styles, target);
 		return target;
 	},
@@ -223,6 +224,7 @@ ART.SVG.Parser = new Class({
 
 	filter: function(styles, target){
 		if (styles.opacity != 1 && target.blend) target.blend(styles.opacity);
+		if (styles.display == 'none') target.hide();
 	},
 	
 	describe: function(element, styles, target){
@@ -364,6 +366,7 @@ ART.SVG.Parser = new Class({
 			image = new ART.Rectangle(width, height).fillImage(href, width, height);
 		}
 		this.filter(styles, image);
+		if (styles.visibility == 'hidden') target.hide();
 		this.describe(element, styles, image);
 		this.transform(element, image);
 		image.transform(1, 0, 0, 1, x, y);
