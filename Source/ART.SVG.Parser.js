@@ -91,7 +91,7 @@ ART.SVG.Parser = new Class({
 			    value = attribute.nodeValue;
 			if (value != 'inherit'){
 				target[name] = value;
-				target[name + '_document'] = element.ownerDocument;
+				if (name == 'fill') target['fill_document'] = element.ownerDocument;
 			}
 		}
 		return target;

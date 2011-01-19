@@ -9,6 +9,7 @@ ART.SVG.Parser.implement({
 		for (var key in target)
 			if (target.hasOwnProperty(key) && target[key] == 'inherit')
 				delete target[key];
+		if (target.hasOwnProperty('fill')) target['fill_document'] = element.ownerDocument;
 		applyStyles.call(this, element, target);
 	},
 	
