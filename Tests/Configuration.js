@@ -9,7 +9,7 @@ Configuration.defaultPresets = {
 	browser: 'samples'
 };
 
-var source = ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'color', 'art-0.9', 'art-svg'];
+var source = ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'art-0.9', 'art-svg'];
 
 // Presets - combine the sets and the source to a preset to easily run a test
 Configuration.presets = {
@@ -1316,21 +1316,15 @@ Configuration.source = {
 		]
 	},
 	
-	'color': {
-		path: 'art/Color/Source/',
-		files: [
-			'Color'
-		]
-	},
-
 	'art-0.9': {
 		path: 'art/Source/',
 		files: [
 			'ART',
+			'ART.Color',
+			'ART.Path',
 			'ART.VML',
 			'ART.SVG',
 			'ART.Base',
-			'ART.Path',
 			'ART.Shapes',
 			'ART.Font'
 		]

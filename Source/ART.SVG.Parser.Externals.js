@@ -1,6 +1,5 @@
+ART.SVG.Parser.implement(new Events());
 ART.SVG.Parser.implement({
-
-	Implements: Events,
 	
 	findByURL: function(document, url, callback){
 		if (!url){

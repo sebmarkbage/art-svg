@@ -34,7 +34,7 @@ var styleSheet = function(){},
 
 // Visitor
 
-ART.SVG.Parser = new Class({
+ART.SVG.Parser = ART.Class({
 
 	parse: function(element, styles){
 		if (!styles)
@@ -162,7 +162,7 @@ ART.SVG.Parser = new Class({
 	parseColor: function(value, opacity, styles){
 		if (value == 'currentColor') value = styles.color;
 		try {
-			var color = new Color(value);
+			var color = new ART.Color(value);
 		} catch (x){
 			// Ignore unparsable colors, TODO: log
 			return null;
@@ -375,6 +375,13 @@ ART.SVG.Parser = new Class({
 
 });
 
-ART.SVG.parse = ART.SVG.Parser.prototype.parse.bind(ART.SVG.Parser.prototype);
+ART.SVG.parse = function(element, styles){
+	return ART.SVG.Parser.prototype.parse(element, styles);
+};
+
+ART.SVG.Parser.implement = function(obj){
+	for (var key in obj)
+		this.prototype[key] = obj[key];
+};
 
 })();
