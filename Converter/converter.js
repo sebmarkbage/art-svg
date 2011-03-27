@@ -5,9 +5,12 @@ new Request.XML({
 	onSuccess:  function(txt, doc){
 	
 		var klass = ART.SVG.parse(doc).toClass();
-	
+		
+		var statements = ART.Script.grabFontExpressions();
+		statements.push(new AST.Variable('Sample').assign(klass));
+		
 		var result = document.createElement('textarea');
-		result.value = 'var Sample = ' + klass + ';';
+		result.value = AST.Block(statements);
 		
 		document.body.appendChild(result);
 	}
