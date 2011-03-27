@@ -1,6 +1,6 @@
 new Request.XML({
 
-	url: location.search.substr(1) || 'testcase.svg',
+	url: location.search.substr(1) || '../Demos/testcase.svg',
 
 	onSuccess:  function(txt, doc){
 	
