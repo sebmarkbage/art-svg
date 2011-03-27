@@ -38,16 +38,30 @@ var testRunner = function(svgPath, pngPath){
 			new Request.XML({
 				url: svgPath,
 				onSuccess: function(txt, doc){
-					try {
+					//try {
 						var result = parser.parse(doc, { viewportWidth: img.width, viewportHeight: img.height });
-					} catch (x){
+					/*} catch (x){
 						failed(x);
 						throw x;
-					}
+					}*/
 					if (result == null){
 						failed('Parser Failed: Returned null');
 					} else {
-						completed(result.toElement(), img);
+						var link = document.createElement('a');
+						link.setAttribute('href', svgPath);
+						link.title = 'Click to view SVG';
+						/*if (ART.prototype instanceof ART.SVG){
+							var svg = document.createElement('iframe');
+							svg.onload = function(){
+								svg.contentWindow.document.documentElement.style.fontFamily = 'Arial';
+							};
+							svg.src = svgPath;
+							svg.width = img.width;
+							svg.height = img.height;
+							img = svg;
+						}*/
+						link.appendChild(img);
+						completed(result.toElement(), link);
 					}
 				},
 				onFailure: function(){
@@ -66,6 +80,8 @@ SetNames = loader.getSetNames();
 SourceNames = loader.getSourceNames();
 
 window.onload = function(){
+	if (ART.Flash) ART.Flash.swf = '../../art-canvas/Source/ART.Flash.swf';
+
 	// Change title
 	document.title = 'Specs for ' + Configuration.name;
 	document.body.appendChild(tester.element);
