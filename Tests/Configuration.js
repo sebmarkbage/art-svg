@@ -9,7 +9,7 @@ Configuration.defaultPresets = {
 	browser: 'samples'
 };
 
-var source = ['core-1.3-base', 'core-1.3-client', 'sheet', 'utils', 'art-0.9', 'art-svg'];
+var source = ['slick', 'sheet', 'utils', 'art-0.9', 'art-svg'];
 
 // Presets - combine the sets and the source to a preset to easily run a test
 Configuration.presets = {
@@ -1251,59 +1251,17 @@ Configuration.sets = {
  */
 Configuration.source = {
 
-	'core-1.3-base': {
-		path: 'mootools-core/Source/',
+	'slick': {
+		path: 'slick/Source/',
 		files: [
-			'Core/Core',
-
-			'Types/Array',
-			'Types/Function',
-			'Types/Number',
-			'Types/String',
-			'Types/Object',
-
-			'Class/Class',
-			'Class/Class.Extras'
-		]
-	},
-	
-	'core-1.3-client': {
-		path: 'mootools-core/Source/',
-		files: [
-			'Types/Event',
-
-			'Browser/Browser',
-
-			'Slick/Slick.Parser',
-			'Slick/Slick.Finder',
-
-			'Element/Element',
-			'Element/Element.Event',
-			'Element/Element.Style',
-			'Element/Element.Dimensions',
-
-			'Utilities/DomReady',
-			'Utilities/JSON',
-			'Utilities/Cookie',
-			'Utilities/Swiff',
-
-			'Fx/Fx',
-			'Fx/Fx.CSS',
-			'Fx/Fx.Tween',
-			'Fx/Fx.Morph',
-			'Fx/Fx.Transitions',
-
-			'Request/Request',
-			'Request/Request.HTML',
-			'Request/Request.JSON'
+			'Slick.Parser',
+			'Slick.Finder'
 		]
 	},
 	
 	'utils': {
 		path: 'utils/',
 		files: [
-			'URI',
-			'Request.XML',
 			'Sheet.Cascade'
 		]
 	},

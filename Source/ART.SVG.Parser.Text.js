@@ -60,11 +60,13 @@ ART.SVG.Parser.implement({
 
 		var node = element.firstChild;
 		
+		var self = this;
+		
 		var next = function(row){
 			if (node.nodeType == 3){
-				var text = this.textContent(node, styles);
+				var text = self.textContent(node, styles);
 				node = node.nextSibling;
-				this.createText(text, styles, row, target, null, function(shape){
+				self.createText(text, styles, row, target, null, function(shape){
 					if (shape){
 						if (shape.width) row.x += shape.width + (shape.left || 0); // TODO: Adjust for rotated text
 						row.push(shape);
@@ -72,13 +74,13 @@ ART.SVG.Parser.implement({
 					if (node) next(row); else continuation(row);
 				});
 			} else {
-				var parseFn = this[node.nodeName + 'Text'];
+				var parseFn = self[node.nodeName + 'Text'];
 				var current = node;
 				node = node.nextSibling;
-				if (parseFn) return parseFn.call(this, current, this.parseStyles(current, styles), row, target, node ? next : continuation);
+				if (parseFn) return parseFn.call(self, current, self.parseStyles(current, styles), row, target, node ? next : continuation);
 				if (node) next(row); else continuation(row);
 			}
-		}.bind(this);
+		};
 		
 		if (node) next(row); else continuation(row);
 	},

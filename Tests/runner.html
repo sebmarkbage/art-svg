@@ -32,9 +32,21 @@ var testRunner = function(svgPath, pngPath){
 		var img = new Image();
 		img.onload = function(){
 			var parser = new ART.SVG.Parser();
-			parser.resolveURL = function(url){
+			/*parser.resolveURL = function(url){
 				return new URI(url, { base: svgPath}).toString();
-			};
+			};*/
+			ART.SVG.load(svgPath, { viewportWidth: img.width, viewportHeight: img.height }, function(result){
+				if (result == null){
+					failed('Parser Failed: Returned null');
+				} else {
+					var link = document.createElement('a');
+					link.setAttribute('href', svgPath);
+					link.title = 'Click to view SVG';
+					link.appendChild(img);
+					completed(result.toElement(), link);
+				}
+			});
+			/*
 			new Request.XML({
 				url: svgPath,
 				onSuccess: function(txt, doc){
@@ -43,7 +55,7 @@ var testRunner = function(svgPath, pngPath){
 					/*} catch (x){
 						failed(x);
 						throw x;
-					}*/
+					}* /
 					if (result == null){
 						failed('Parser Failed: Returned null');
 					} else {
@@ -59,7 +71,7 @@ var testRunner = function(svgPath, pngPath){
 							svg.width = img.width;
 							svg.height = img.height;
 							img = svg;
-						}*/
+						}* /
 						link.appendChild(img);
 						completed(result.toElement(), link);
 					}
@@ -67,7 +79,7 @@ var testRunner = function(svgPath, pngPath){
 				onFailure: function(){
 					failed('Failed to load file: ' + svgPath);
 				}
-			}).get();
+			}).get();*/
 		};
 		img.src = pngPath;
 	};

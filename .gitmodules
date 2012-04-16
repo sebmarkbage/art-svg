@@ -1,9 +1,9 @@
-[submodule "Tests/mootools-core"]
-	path = Tests/mootools-core
-	url = http://github.com/mootools/mootools-core.git
 [submodule "Tests/art"]
 	path = Tests/art
 	url = http://github.com/calyptus/art.git
+[submodule "Tests/slick"]
+	path = Tests/slick
+	url = http://github.com/mootools/slick.git
 [submodule "Tests/sheet.js"]
 	path = Tests/sheet.js
 	url = http://github.com/subtleGradient/Sheet.js.git

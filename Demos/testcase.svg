@@ -13,7 +13,7 @@
   <defs> 
     <font-face font-family="SVGFreeSansISO-8859-1" unicode-range="U+0-FF"> 
       <font-face-src> 
-        <font-face-uri xlink:href="../images/SVGFreeSans-ISO-8859-1.svg#iso_8859_1" /> 
+        <font-face-uri xlink:href="../Tests/SVG1.2/images/SVGFreeSans-ISO-8859-1.svg#iso_8859_1" /> 
       </font-face-src> 
     </font-face> 
   </defs> 

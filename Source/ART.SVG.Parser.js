@@ -37,6 +37,8 @@ var styleSheet = function(){},
 ART.SVG.Parser = ART.Class({
 
 	parse: function(element, styles){
+		if (typeof element == 'string') element = this.parseXML(element);
+
 		if (!styles)
 			styles = this.findStyles(element);
 		else
@@ -60,6 +62,24 @@ ART.SVG.Parser = ART.Class({
 		styles = this.parseStyles(element, styles);
 		var parseFunction = this[element.nodeName + 'Element'];
 		return parseFunction ? parseFunction.call(this, element, styles) : null;
+	},
+	
+	parseXML: window.DOMParser ? function(text){
+		return new DOMParser().parseFromString(text, 'text/xml');
+	} : function(text){
+		try {
+			var xml;
+			try { xml = new ActiveXObject('MSXML2.DOMDocument'); }
+			catch (e){ xml = new ActiveXObject('Microsoft.XMLDOM'); }
+			xml.resolveExternals = false;
+			xml.validateOnParse = false;
+			xml.async = false;
+			xml.preserveWhiteSpace = true;
+			xml.loadXML(text);
+			return xml;
+		} catch (e){
+			return null;
+		}
 	},
 	
 	parseStyles: function(element, styles){
